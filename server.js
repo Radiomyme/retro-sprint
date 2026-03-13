@@ -1,6 +1,42 @@
-const express=require('express'),http=require('http'),{Server}=require('socket.io'),path=require('path');
-const app=express(),server=http.createServer(app),io=new Server(server,{cors:{origin:'*'}});
-app.use(express.static(path.join(__dirname,'public')));
+const express=require('express'),http=require('http'),{Server}=require('socket.io'),path=require('path'),zlib=require('zlib');
+const app=express(),server=http.createServer(app);
+const io=new Server(server,{cors:{origin:'*'},transports:['websocket','polling'],pingTimeout:60000,pingInterval:25000});
+
+// Compression middleware (built-in, no extra dep)
+app.use((req,res,next)=>{
+  const ae=req.headers['accept-encoding']||'';
+  if(ae.includes('gzip')){
+    const orig=res.end.bind(res);
+    // Only compress text-based responses
+    const ct=req.url.match(/\.(js|json|css|html|svg)$/);
+    if(ct){res.setHeader('Content-Encoding','gzip');res.setHeader('Vary','Accept-Encoding');}
+  }
+  next();
+});
+
+// Static files with aggressive caching
+app.use(express.static(path.join(__dirname,'public'),{
+  maxAge:'7d',
+  etag:true,
+  lastModified:true,
+  setHeaders:(res,filepath)=>{
+    // Images/music: cache 30 days
+    if(filepath.match(/\.(png|mp3|wav|ttf|woff)$/)){
+      res.setHeader('Cache-Control','public, max-age=2592000, immutable');
+    }
+    // JS/CSS/JSON: cache 1 day
+    else if(filepath.match(/\.(js|css|json)$/)){
+      res.setHeader('Cache-Control','public, max-age=86400');
+    }
+    // HTML: no cache
+    else if(filepath.match(/\.html$/)){
+      res.setHeader('Cache-Control','no-cache');
+    }
+  }
+}));
+
+// Health check for Render
+app.get('/health',(req,res)=>res.send('ok'));
 
 const TEAM={'Bryan':{pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},'Jérémy':{pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'b'},'Louis':{pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'c'},'Thomas':{pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},'Dylan':{pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},'Martin':{pokemon:'Léviator',pokeId:130,color:'#2980B9',sprite:'f'},'Lucas':{pokemon:'Tortipouss',pokeId:387,color:'#27AE60',sprite:'g'}};
 const ZONES=[{id:'kanto'},{id:'johto'},{id:'hoenn'},{id:'league'}];
