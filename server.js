@@ -1,20 +1,18 @@
 const express=require('express'),http=require('http'),{Server}=require('socket.io'),path=require('path');
 const app=express(),server=http.createServer(app);
-const io=new Server(server,{cors:{origin:'*'},transports:['websocket','polling'],pingTimeout:60000,pingInterval:25000});
+// IMPORTANT: polling first, then upgrade to websocket (required for Render/cloud proxies)
+const io=new Server(server,{
+  cors:{origin:'*',methods:['GET','POST']},
+  transports:['polling','websocket'],
+  pingTimeout:60000,
+  pingInterval:25000,
+  allowEIO3:true
+});
 
-// Static files with cache
-app.use(express.static(path.join(__dirname,'public'),{
-  maxAge:'7d',
-  etag:true,
-  lastModified:true,
-  setHeaders:(res,fp)=>{
-    if(fp.match(/\.(png|mp3|wav|ttf|woff)$/))res.setHeader('Cache-Control','public, max-age=2592000, immutable');
-    else if(fp.match(/\.(js|css|json)$/))res.setHeader('Cache-Control','public, max-age=86400');
-    else if(fp.match(/\.html$/))res.setHeader('Cache-Control','no-cache');
-  }
-}));
+app.use(express.static(path.join(__dirname,'public'),{maxAge:'7d',etag:true}));
+app.get('/health',(req,res)=>res.json({ok:true,players:Object.keys(S.players).length}));
 
-app.get('/health',(req,res)=>res.send('ok'));
+console.log('Server starting...');
 
 const TEAM={'Bryan':{pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},'Jérémy':{pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'b'},'Louis':{pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'c'},'Thomas':{pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},'Dylan':{pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},'Martin':{pokemon:'Léviator',pokeId:130,color:'#2980B9',sprite:'f'},'Lucas':{pokemon:'Tortipouss',pokeId:387,color:'#27AE60',sprite:'g'}};
 const ZONES=[{id:'kanto'},{id:'johto'},{id:'hoenn'},{id:'league'}];
@@ -27,8 +25,10 @@ function fSid(name){return Object.keys(S.players).find(s=>S.players[s].name===na
 function updBadges(n){if(!S.badges[n])S.badges[n]={};['kanto','johto','hoenn','league'].forEach(z=>{if(S.cards.some(c=>c.zone===z&&c.author===n))S.badges[n][z]=true;});if(['kanto','johto','hoenn','league'].every(z=>S.badges[n][z])&&!S.badges[n].master){S.badges[n].master=true;io.emit('badge:master',{player:n});}io.emit('badges:update',S.badges);}
 
 io.on('connection',socket=>{
+  console.log('✓ Player connected:',socket.id);
   socket.on('join',({name,isAdmin})=>{
-    const td=TEAM[name];if(!td)return;
+    const td=TEAM[name];if(!td){console.log('✗ Unknown player:',name);return;}
+    console.log('✓ Joined:',name);
     const p={id:socket.id,name,...td,isAdmin:!!isAdmin,x:19,y:26,dir:'down'};
     S.players[socket.id]=p;
     if(!S.playerHp[name])S.playerHp[name]=-1;

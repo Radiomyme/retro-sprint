@@ -68,7 +68,9 @@ function startG(name){
   document.getElementById('select-screen').style.display='none';
   document.getElementById('game-screen').classList.add('active');
   document.getElementById('map-bg').style.cssText=`width:${MW*TS}px;height:${MH*TS}px`;
-  sk=io();sk.emit('join',{name,isAdmin:isA});
+  sk=io({transports:['polling','websocket'],upgrade:true});
+  sk.on('connect',()=>{console.log('Socket connected:',sk.id);sk.emit('join',{name,isAdmin:isA});});
+  sk.on('connect_error',e=>console.error('Socket error:',e.message));
   setupSk();setupCtrl();updMe();updCam();updHUD();hideT();playBg();
 }
 
