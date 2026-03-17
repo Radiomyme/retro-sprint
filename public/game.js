@@ -506,8 +506,8 @@ const battle={
     ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
     // Ground shadows
     ctx.fillStyle='rgba(0,0,0,.10)';
-    ctx.beginPath();ctx.ellipse(w*.70,h*.44,w*.16,h*.06,0,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(w*.28,h*.72,w*.14,h*.045,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(w*.70,h*.44,w*.20,h*.07,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(w*.22,h*.78,w*.18,h*.055,0,0,Math.PI*2);ctx.fill();
     // Grass detail
     ctx.fillStyle='rgba(80,140,60,.15)';
     for(let i=0;i<8;i++)ctx.fillRect(i*w/8+4*S,h*.50+Math.sin(i*1.5)*6*S,12*S,2*S);
@@ -519,23 +519,23 @@ const battle={
     }
     if(this.flashTimer>0){this.flashTimer--;this.shakeX=this.flashTimer>12?(this.flashTimer%2===0?4*S:-4*S):0;}
 
-    // ─── OPPONENT SPRITE (upper right, BIGGER & better positioned) ───
-    const os=Math.min(w*.30,h*.50,110*S);
+    // ─── OPPONENT SPRITE (upper right, large & well positioned) ───
+    const os=Math.min(w*.38,h*.62,150*S);
     if(this.oppSprite?.complete&&this.oppSprite.naturalWidth>0&&this.oppHpCur>0){
-      const ox=w*.58+oppOff+(this.flashTarget==='opp'?this.shakeX:0);
-      const oy=h*.42-os; // position so bottom of sprite sits on ground platform
+      const ox=w*.55+oppOff+(this.flashTarget==='opp'?this.shakeX:0);
+      const oy=h*.44-os; // bottom of sprite sits on ground platform
       if(this.flashTarget==='opp'&&this.flashTimer>0&&this.flashTimer%4<2)ctx.globalAlpha=.3;
       ctx.imageSmoothingEnabled=false;
       ctx.drawImage(this.oppSprite,ox,oy,os,os);ctx.globalAlpha=1;
     }
     // Catch ball (during catch animation)
     if(this.catchBallImg?.complete&&this.catchBallImg.naturalWidth>0&&this.oppHpCur>0){
-      ctx.drawImage(this.catchBallImg,w*.65,h*.15,20*S,20*S);
+      ctx.drawImage(this.catchBallImg,w*.68,h*.12,24*S,24*S);
     }
-    // ─── PLAYER SPRITE (lower left, big back view) ───
-    const ms=Math.min(w*.28,h*.48,100*S);
+    // ─── PLAYER SPRITE (lower left, large back view) ───
+    const ms=Math.min(w*.36,h*.58,140*S);
     if(this.mySprite?.complete&&this.mySprite.naturalWidth>0&&this.myHpCur>0){
-      const mx=w*.06+myOff+(this.flashTarget==='my'?this.shakeX:0),my=h*.40;
+      const mx=w*.04+myOff+(this.flashTarget==='my'?this.shakeX:0),my=h*.35;
       if(this.flashTarget==='my'&&this.flashTimer>0&&this.flashTimer%4<2)ctx.globalAlpha=.3;
       ctx.imageSmoothingEnabled=false;
       ctx.drawImage(this.mySprite,mx,my,ms,ms);ctx.globalAlpha=1;
