@@ -4,7 +4,7 @@ const SP=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/p
 const SPB=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`;
 const BALL=['/assets/battle/ball-open-1.png','/assets/battle/ball-open-2.png','/assets/battle/ball-open-3.png','/assets/battle/ball-open-4.png','/assets/battle/ball-open-5.png'];
 const BALL_IDLE='/assets/battle/ball-idle.png',BALL_L='/assets/battle/ball-left.png',BALL_R='/assets/battle/ball-right.png';
-const TILE=16,SC=2.5,TS=TILE*SC,MW=40,MH=36,MMS=140;
+const TILE=16,SC=2.5,TS=TILE*SC,MMS=140;
 const TEAM=[
   {name:'Bryan',pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},
   {name:'Jérémy',pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'b'},
@@ -19,10 +19,93 @@ const ZONES=[
   {id:'hoenn',name:'Arène Hoenn',icon:'✨',color:'#E74C3C',prompt:'Imprévus ou partages ?'},
   {id:'league',name:'Ligue Pokémon',icon:'🏆',color:'#2ECC71',prompt:'Actions sprint ?'}];
 const TC={Normal:'#a8a878',Feu:'#f08030',Eau:'#6890f0',Plante:'#78c850','Électrik':'#f8d030',Glace:'#98d8d8',Combat:'#c03028',Poison:'#a040a0',Sol:'#e0c068',Vol:'#a890f0',Psy:'#f85888',Insecte:'#a8b820',Roche:'#b8a038',Spectre:'#705898',Dragon:'#7038f8','Ténèbres':'#705848',Acier:'#b8b8d0','Fée':'#ee99ac'};
-// Walls
+
+// ═══ OVERWORLD MAP ═══
+const OW={w:40,h:36};
 const WR={"0":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39],"1":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39],"2":[0,1,2,3,10,17,23,35,36,37,38,39],"3":[0,1,2,3,10,17,23,24,25,26,27,35,36,37,38,39],"4":[0,1,2,3,10,16,17,19,23,26,35,36,37,38,39],"5":[0,1,2,3,10,17,18,20,21,22,23,26,27,35,36,37,38,39],"6":[0,1,2,3,10,14,17,27,35,36,37,38,39],"7":[0,1,2,3,4,5,6,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34,35,36,37,38,39],"8":[0,1,2,3,35,36,37,38,39],"9":[0,1,2,3,15,35,36,37,38,39],"10":[0,1,2,3,34,35,36,37,38,39],"11":[0,1,2,3,34,35,36,37,38,39],"12":[0,1,2,3,28,29,30,31,34,35,36,37,38,39],"13":[0,1,2,3,28,30,31,34,35,36,37,38,39],"14":[0,1,2,3,12,13,14,15,16,17,22,23,24,25,34,35,36,37,38,39],"15":[0,1,2,3,12,13,14,15,16,17,22,23,24,25,34,35,36,37,38,39],"16":[0,1,2,3,12,13,14,15,16,17,22,23,24,25,35,36,37,38,39],"17":[0,1,2,3,11,12,13,14,15,17,22,24,25,36,37,38,39],"18":[0,1,2,3,18,36,37,38,39],"19":[0,1,2,3,18,33,36,37,38,39],"20":[0,1,2,3,18,34,35,36,37,38,39],"21":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,34,35,36,37,38,39],"22":[0,1,2,3,12,13,14,15,34,35,36,37,38,39],"23":[0,1,2,3,12,13,14,15,22,23,24,25,26,27,28,29,34,35,36,37,38,39],"24":[0,1,2,3,12,13,14,15,21,30,34,35,36,37,38,39],"25":[0,1,2,3,12,14,15,21,30,34,35,36,37,38,39],"26":[0,1,2,3,21,30,35,36,37,38,39],"27":[0,1,2,3,21,30,35,36,37,38,39],"28":[0,1,2,3,6,7,8,9,21,30,35,36,37,38,39],"29":[0,1,2,3,6,8,9,19,21,22,23,24,26,27,28,29,30,35,36,37,38,39],"30":[0,1,2,3,35,36,37,38,39],"31":[0,1,2,3,35,36,37,38,39],"32":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39],"33":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39],"34":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39],"35":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]};
-const DOORS={'7_14':'kanto','13_29':'johto','17_23':'hoenn','17_16':'league','25_13':'heal','29_7':'npc'};
-// Encounters happen anywhere on the map
+
+// ═══ BUILDING INTERIORS (from pokemon-js original data) ═══
+const BUILDINGS={
+  'pokemon-center':{
+    img:'/assets/map/interior/pokemon-center.png',w:14,h:8,
+    start:{x:4,y:6},
+    walls:{2:[0,1,2,3,4,5,6,7,8,9,10,11,12,13],3:[13],4:[0],5:[0],6:[1,6,7,12,13],7:[1,6,7,12,13]},
+    exits:{7:[3,4]},
+    exitTo:{mapId:'overworld',x:13,y:26,dir:'down'},
+    music:'/assets/music/maps/pokemon-center.mp3',
+    npcs:[{type:'nurse',x:3,y:3,sprite:'/assets/character/nurse-joy.png',dir:'down'}],
+    hotspots:[
+      {x:3,y:3,face:'up',action:'heal',label:'Infirmière Joëlle'},
+      {x:13,y:3,face:'up',action:'pokedex',label:'PC - Pokédex'}
+    ]
+  },
+  'gym':{
+    img:'/assets/map/interior/gym.png',w:10,h:14,
+    start:{x:4,y:12},
+    walls:{0:[0,1,2,3,4,5,6,7,8,9],1:[0,9],2:[0,9],3:[0,1,2,3,6,7,8,9],4:[0,9],5:[0,2,5,6,7,9],6:[0,9],7:[0,2,5,6,7,9],8:[0,9],9:[0,1,2,3,6,7,8,9],10:[3,6]},
+    exits:{13:[4,5]},
+    exitTo:{mapId:'overworld',x:16,y:18,dir:'down'},
+    music:'/assets/music/maps/pokemon-gym.mp3',
+    npcs:[],
+    hotspots:[
+      {x:4,y:2,face:'up',action:'zone',zone:'league',label:'🏆 Champion - Actions Sprint'}
+    ]
+  },
+  'poke-mart':{
+    img:'/assets/map/interior/poke-mart.png',w:8,h:8,
+    start:{x:4,y:6},
+    walls:{1:[0,1,2,3,4,5,6,7],3:[0,1,4,5,6,7],4:[1,4,5,6,7],5:[1],6:[0,1]},
+    exits:{7:[3,4]},
+    exitTo:{mapId:'overworld',x:23,y:18,dir:'down'},
+    music:'/assets/music/maps/pokemon-center.mp3',
+    npcs:[],
+    hotspots:[
+      {x:1,y:4,face:'up',action:'zone',zone:'hoenn',label:'✨ Vendeur - Imprévus & Partages'}
+    ]
+  },
+  'museum-1f':{
+    img:'/assets/map/interior/museum-1f.png',w:20,h:8,
+    start:{x:10,y:6},
+    walls:{0:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],1:[11,12,13,14,15,16,17,18,19],2:[1,2,3,4,11,12,16],3:[1,2,3,4,11,12],4:[11],5:[1,2,3,4,8,11,12,13,14],6:[1,2,3,4,8,13,14,19],7:[8,13,14,19]},
+    exits:{7:[10,11]},
+    exitTo:{mapId:'overworld',x:14,y:8,dir:'down'},
+    music:null,
+    npcs:[],
+    hotspots:[
+      {x:3,y:4,face:'up',action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
+      {x:6,y:4,face:'up',action:'zone',zone:'kanto',label:'⚡ Exposition - Super Efficace !'}
+    ]
+  },
+  'npc-house-b':{
+    img:'/assets/map/interior/npc-house.png',w:8,h:8,
+    start:{x:3,y:6},
+    walls:{0:[0,1,2,3,4,5,6,7],1:[0,1,7],3:[3,4],4:[3,4],6:[0,7],7:[0,7]},
+    exits:{7:[2,3]},
+    exitTo:{mapId:'overworld',x:29,y:14,dir:'down'},
+    music:null,
+    npcs:[],
+    hotspots:[
+      {x:4,y:2,face:'up',action:'zone',zone:'johto',label:"🌑 Journal - Qu'est-ce qui n'a pas marché ?"}
+    ]
+  },
+  'npc-house-a':{
+    img:'/assets/map/interior/npc-house.png',w:8,h:8,
+    start:{x:3,y:6},
+    walls:{0:[0,1,2,3,4,5,6,7],1:[0,1,7],3:[3,4],4:[3,4],6:[0,7],7:[0,7]},
+    exits:{7:[2,3]},
+    exitTo:{mapId:'overworld',x:7,y:30,dir:'down'},
+    music:null,
+    npcs:[],
+    hotspots:[
+      {x:4,y:2,face:'up',action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']}
+    ]
+  }
+};
+
+// Doors on the overworld: y_x → building ID
+const DOORS={'7_14':'museum-1f','13_29':'npc-house-b','17_23':'poke-mart','17_16':'gym','25_13':'pokemon-center','29_7':'npc-house-a'};
+
+// Encounters happen on overworld only
 const ENC=[{id:16,ch:10},{id:21,ch:8},{id:19,ch:8},{id:39,ch:6},{id:10,ch:5},{id:27,ch:5},{id:25,ch:5},{id:63,ch:4},{id:35,ch:4},{id:147,ch:3},{id:133,ch:3},{id:37,ch:3},{id:43,ch:3},{id:56,ch:3},{id:66,ch:3},{id:74,ch:3},{id:92,ch:3},{id:48,ch:3},{id:58,ch:2},{id:77,ch:2},{id:100,ch:2},{id:104,ch:2},{id:123,ch:2},{id:129,ch:2},{id:95,ch:1},{id:131,ch:1},{id:142,ch:1},{id:143,ch:1},{id:149,ch:1}];
 const ELV=[15,18,20,22,25];
 let TYPE_CHART={};
@@ -30,17 +113,34 @@ let TYPE_CHART={};
 let PD={},me=null,myT=null,sk=null,isA=false;
 let pls={},cards=[],votes={},badges={},openA={},catches=[],allCatches={},pvpWins={};
 let px=19,py=26,dir='down',mov=false,wf=0,gs=0,myHp=-1,myMx=160;
+let curMap='overworld'; // current map ID
 let inB=false,batId=null,batSide=null,pvpPk=null;
-let bgM=null,btM=null;
+let bgM=null,btM=null,bldM=null;
+let interiorImgs={};
 
 Promise.all([
   fetch('/pokemon-data.json').then(r=>r.json()),
   fetch('/type-chart.json').then(r=>r.json())
 ]).then(([pd,tc])=>{PD=pd;TYPE_CHART=tc;initSel();});
 
-function playBg(){if(!bgM){bgM=new Audio('/assets/music/pewter-city.mp3');bgM.loop=true;bgM.volume=.25;}btM?.pause();bgM.play().catch(()=>{});}
-function playBt(){if(!btM){btM=new Audio('/assets/music/battle.mp3');btM.loop=true;btM.volume=.35;}bgM?.pause();btM.currentTime=0;btM.play().catch(()=>{});}
-function stopBt(){btM?.pause();bgM?.play().catch(()=>{});}
+// ═══ MUSIC ═══
+function playBg(){
+  if(curMap!=='overworld'){playBldMusic();return;}
+  bldM?.pause();
+  if(!bgM){bgM=new Audio('/assets/music/pewter-city.mp3');bgM.loop=true;bgM.volume=.25;}
+  btM?.pause();bgM.play().catch(()=>{});
+}
+function playBt(){if(!btM){btM=new Audio('/assets/music/battle.mp3');btM.loop=true;btM.volume=.35;}bgM?.pause();bldM?.pause();btM.currentTime=0;btM.play().catch(()=>{});}
+function stopBt(){btM?.pause();playBg();}
+function playBldMusic(){
+  const bld=BUILDINGS[curMap];
+  if(!bld||!bld.music){bgM?.pause();bldM?.pause();return;}
+  bgM?.pause();
+  if(!bldM||bldM._src!==bld.music){
+    bldM?.pause();bldM=new Audio(bld.music);bldM._src=bld.music;bldM.loop=true;bldM.volume=.25;
+  }
+  bldM.play().catch(()=>{});
+}
 
 function getTypeEff(atkType,defTypes){
   let e=1;
@@ -67,18 +167,85 @@ function startG(name){
   const pk=PD[myT.pokeId]||{hp:160};myMx=pk.hp;
   document.getElementById('select-screen').style.display='none';
   document.getElementById('game-screen').classList.add('active');
-  document.getElementById('map-bg').style.cssText=`width:${MW*TS}px;height:${MH*TS}px`;
+  updateMapDisplay();
   sk=io({transports:['polling','websocket'],upgrade:true});
   sk.on('connect',()=>{console.log('Socket connected:',sk.id);sk.emit('join',{name,isAdmin:isA});});
   sk.on('connect_error',e=>console.error('Socket error:',e.message));
   setupSk();setupCtrl();updMe();updCam();updHUD();hideT();playBg();
+  // Preload interior images
+  Object.entries(BUILDINGS).forEach(([id,b])=>{const img=new Image();img.src=b.img;interiorImgs[id]=img;});
+}
+
+// ═══ MAP DISPLAY ═══
+function updateMapDisplay(){
+  const mc=document.getElementById('map-container');
+  const bg=document.getElementById('map-bg');
+  if(curMap==='overworld'){
+    bg.src='/assets/map/pewter-city.png';
+    bg.style.cssText=`width:${OW.w*TS}px;height:${OW.h*TS}px`;
+  }else{
+    const bld=BUILDINGS[curMap];if(!bld)return;
+    bg.src=bld.img;
+    bg.style.cssText=`width:${bld.w*TS}px;height:${bld.h*TS}px`;
+  }
+  // Remove NPC elements and recreate
+  document.querySelectorAll('.npc-sp').forEach(e=>e.remove());
+  if(curMap!=='overworld'){
+    const bld=BUILDINGS[curMap];
+    if(bld&&bld.npcs){
+      bld.npcs.forEach(npc=>{
+        const el=document.createElement('div');el.className='psp npc-sp';
+        el.style.cssText=`left:${npc.x*TS}px;top:${npc.y*TS}px;width:${TS}px;height:${TS}px;position:absolute;z-index:12`;
+        el.innerHTML=`<img src="${npc.sprite}" style="width:${TS}px;height:${TS}px;image-rendering:pixelated">`;
+        document.getElementById('map-container').appendChild(el);
+      });
+    }
+    // Draw hotspot indicators
+    drawHotspots();
+  }
+}
+
+function drawHotspots(){
+  document.querySelectorAll('.hotspot-ind').forEach(e=>e.remove());
+  if(curMap==='overworld')return;
+  const bld=BUILDINGS[curMap];if(!bld)return;
+  bld.hotspots.forEach(hs=>{
+    if(hs.action==='heal')return; // nurse handles this visually
+    const el=document.createElement('div');el.className='hotspot-ind';
+    el.style.cssText=`left:${hs.x*TS}px;top:${hs.y*TS}px;width:${TS}px;height:${TS}px;position:absolute;z-index:3;pointer-events:none`;
+    // Pulsing glow indicator
+    const zone=hs.zone?ZONES.find(z=>z.id===hs.zone):null;
+    const color=zone?zone.color:'#FFD93D';
+    el.innerHTML=`<div style="width:100%;height:100%;border:2px solid ${color};border-radius:4px;background:${color}22;animation:hsPulse 1.5s ease-in-out infinite"></div>`;
+    document.getElementById('map-container').appendChild(el);
+  });
+}
+
+// ═══ MAP TRANSITION ═══
+function enterBuilding(bldId){
+  const bld=BUILDINGS[bldId];if(!bld)return;
+  curMap=bldId;
+  px=bld.start.x;py=bld.start.y;dir='up';wf=0;
+  sk.emit('changeMap',{mapId:bldId,x:px,y:py,dir});
+  updateMapDisplay();updMe();updCam();playBldMusic();
+  // Door sound
+  const ds=new Audio('/assets/music/enter-door.mp3');ds.volume=.3;ds.play().catch(()=>{});
+}
+
+function exitBuilding(){
+  const bld=BUILDINGS[curMap];if(!bld)return;
+  const to=bld.exitTo;
+  curMap=to.mapId;px=to.x;py=to.y;dir=to.dir||'down';wf=0;
+  sk.emit('changeMap',{mapId:curMap,x:px,y:py,dir});
+  updateMapDisplay();updMe();updCam();playBg();
 }
 
 // ═══ SOCKET ═══
 function setupSk(){
   sk.on('joined',d=>{pls=d.players;cards=d.cards;votes=d.votes;openA=d.openArenas||{};badges=d.badges||{};catches=d.catches||[];allCatches=d.allCatches||{};pvpWins=d.pvpWins||{};if(d.hp>0)myHp=d.hp;else myHp=myMx;updHUD();rendO();});
   sk.on('player:joined',p=>{pls[p.id]=p;rendO();updHUD();});
-  sk.on('player:moved',({id,x,y,dir:d})=>{if(pls[id]){pls[id].x=x;pls[id].y=y;pls[id].dir=d;rendO();}});
+  sk.on('player:moved',({id,x,y,dir:d,mapId})=>{if(pls[id]){pls[id].x=x;pls[id].y=y;pls[id].dir=d;if(mapId!==undefined)pls[id].mapId=mapId;rendO();}});
+  sk.on('player:mapChanged',({id,mapId,x,y,dir:d})=>{if(pls[id]){pls[id].mapId=mapId;pls[id].x=x;pls[id].y=y;pls[id].dir=d;rendO();}});
   sk.on('player:left',({id})=>{delete pls[id];rendO();updHUD();});
   sk.on('cards:update',c=>{cards=c;refZ();});
   sk.on('votes:update',v=>{votes=v;});
@@ -109,28 +276,53 @@ function showT(t){const b=document.getElementById('text-box');b.textContent=t;b.
 function hideT(){document.getElementById('text-box').style.display='none';}
 
 // ═══ MOVEMENT ═══
-function blk(x,y){if(x<0||x>=MW||y<0||y>=MH)return true;return WR[y]&&WR[y].includes(x);}
+function getMapW(){return curMap==='overworld'?OW.w:BUILDINGS[curMap]?.w||8;}
+function getMapH(){return curMap==='overworld'?OW.h:BUILDINGS[curMap]?.h||8;}
+function getWalls(){return curMap==='overworld'?WR:(BUILDINGS[curMap]?.walls||{});}
+
+function blk(x,y){
+  const mw=getMapW(),mh=getMapH();
+  if(x<0||x>=mw||y<0||y>=mh)return true;
+  const walls=getWalls();
+  return walls[y]&&walls[y].includes(x);
+}
+
 let hD=null,hTm=null;
 function tryM(d){
   if(mov||inB)return;dir=d;updMe();
   const dx={left:-1,right:1,up:0,down:0}[d],dy={up:-1,down:1,left:0,right:0}[d];
   const nx=px+dx,ny=py+dy;
-  if(blk(nx,ny)||Object.values(pls).some(p=>p.name!==me&&Math.round(p.x||0)===nx&&Math.round(p.y||0)===ny))return;
-  mov=true;px=nx;py=ny;wf=(wf+1)%3;updMe();updCam();sk.emit('move',{x:px,y:py,dir});
+  // Check collision with other players on same map
+  if(blk(nx,ny)||Object.values(pls).some(p=>p.name!==me&&(p.mapId||'overworld')===curMap&&Math.round(p.x||0)===nx&&Math.round(p.y||0)===ny))return;
+  mov=true;px=nx;py=ny;wf=(wf+1)%3;updMe();updCam();sk.emit('move',{x:px,y:py,dir,mapId:curMap});
   setTimeout(()=>{
     mov=false;wf=0;updMe();
-    const key=`${py}_${px}`;
-    if(DOORS[key]){const act=DOORS[key];
-      if(act==='heal'){sk.emit('heal');return;}
-      if(act==='npc'){showT('Bienvenue !');setTimeout(hideT,2e3);return;}
-      if(!openA[act]){showT(`🔒 ${ZONES.find(z=>z.id===act).name} fermée !`);setTimeout(hideT,2e3);}
-      else openZone(act);return;}
-    gs++;if(gs>4&&Math.random()<.08){gs=0;startWild();}
+    if(curMap==='overworld'){
+      // Check doors
+      const key=`${py}_${px}`;
+      if(DOORS[key]){
+        enterBuilding(DOORS[key]);
+        return;
+      }
+      // Wild encounters only on overworld
+      gs++;if(gs>4&&Math.random()<.08){gs=0;startWild();}
+    }else{
+      // Check exits in building
+      const bld=BUILDINGS[curMap];
+      if(bld&&bld.exits[py]&&bld.exits[py].includes(px)){
+        exitBuilding();return;
+      }
+    }
   },MMS);
 }
-function updCam(){const vp=document.getElementById('viewport'),w=vp.clientWidth,h=vp.clientHeight;
-  const tx=Math.max(0,Math.min(MW*TS-w,px*TS+TS/2-w/2)),ty=Math.max(0,Math.min(MH*TS-h,py*TS+TS/2-h/2));
-  document.getElementById('map-container').style.transform=`translate(${-tx}px,${-ty}px)`;}
+function updCam(){
+  const vp=document.getElementById('viewport'),w=vp.clientWidth,h=vp.clientHeight;
+  const mw=getMapW(),mh=getMapH();
+  const mapPxW=mw*TS,mapPxH=mh*TS;
+  const tx=Math.max(0,Math.min(mapPxW-w,px*TS+TS/2-w/2));
+  const ty=Math.max(0,Math.min(mapPxH-h,py*TS+TS/2-h/2));
+  document.getElementById('map-container').style.transform=`translate(${-tx}px,${-ty}px)`;
+}
 function updMe(){
   let el=document.getElementById('me-sp');
   if(!el){el=document.createElement('div');el.id='me-sp';el.className='psp me';el.innerHTML=`<div class="plbl"></div><img>`;document.getElementById('map-container').appendChild(el);}
@@ -141,9 +333,13 @@ function updMe(){
 }
 function rendO(){
   document.querySelectorAll('.oth').forEach(e=>e.remove());
-  Object.values(pls).forEach(p=>{if(p.name===me)return;const t=TEAM.find(tt=>tt.name===p.name);if(!t)return;
+  Object.values(pls).forEach(p=>{
+    if(p.name===me)return;
+    // Only show players on the same map
+    if((p.mapId||'overworld')!==curMap)return;
+    const t=TEAM.find(tt=>tt.name===p.name);if(!t)return;
     const el=document.createElement('div');el.className='psp oth';
-    el.style.cssText=`left:${(p.x||19)*TS}px;top:${(p.y||26)*TS}px;width:${TS}px;height:${TS}px;position:absolute;z-index:10`;
+    el.style.cssText=`left:${(p.x||0)*TS}px;top:${(p.y||0)*TS}px;width:${TS}px;height:${TS}px;position:absolute;z-index:10`;
     el.innerHTML=`<div class="plbl" style="color:${t.color}">${p.name}</div><img src="/assets/walk-sprites/${t.sprite}-${p.dir||'down'}.png" style="width:${TS}px;height:${TS}px;image-rendering:pixelated">`;
     document.getElementById('map-container').appendChild(el);
   });
@@ -173,9 +369,56 @@ function setupCtrl(){
 }
 function pressA(){
   if(inB)return;
+
+  // Inside a building: check hotspot interactions
+  if(curMap!=='overworld'){
+    const bld=BUILDINGS[curMap];
+    if(bld){
+      const dx={left:-1,right:1,up:0,down:0}[dir],dy={up:-1,down:1,left:0,right:0}[dir];
+      const fx=px+dx,fy=py+dy;
+      for(const hs of bld.hotspots){
+        if(hs.x===fx&&hs.y===fy){
+          if(hs.action==='heal'){
+            sk.emit('heal');
+            const recSnd=new Audio('/assets/music/pokemon-recovery.mp3');recSnd.volume=.4;recSnd.play().catch(()=>{});
+            return;
+          }
+          if(hs.action==='pokedex'){window._dex();return;}
+          if(hs.action==='zone'){
+            if(!openA[hs.zone]){showT(`🔒 ${ZONES.find(z=>z.id===hs.zone).name} fermée !`);setTimeout(hideT,2e3);return;}
+            openZone(hs.zone);return;
+          }
+          if(hs.action==='text'){
+            let idx=0;
+            const showNext=()=>{
+              if(idx<hs.texts.length){showT(hs.texts[idx]);idx++;}
+              else hideT();
+            };
+            showNext();
+            // Override A temporarily to advance text
+            const origA=pressA;
+            window._textAdv=showNext;
+            return;
+          }
+        }
+      }
+      // Check for other players to battle/talk (same as overworld)
+      for(const p of Object.values(pls)){
+        if(p.name!==me&&(p.mapId||'overworld')===curMap&&Math.round(p.x||0)===fx&&Math.round(p.y||0)===fy){
+          const t=TEAM.find(tt=>tt.name===p.name);
+          showT(`${p.name} (${t?t.pokemon:'?'})`);
+          document.getElementById('text-box').innerHTML+=`<div style="display:flex;gap:6px;margin-top:4px"><button class="choice-btn" onclick="window._ch('${p.name}')">⚔️ Combat</button><button class="choice-btn" onclick="window._ct('${p.name}')">💬 Parler</button></div>`;
+          return;
+        }
+      }
+    }
+    return;
+  }
+
+  // Overworld: check players in front
   const dx={left:-1,right:1,up:0,down:0}[dir],dy={up:-1,down:1,left:0,right:0}[dir];
   for(const p of Object.values(pls)){
-    if(p.name!==me&&Math.round(p.x||0)===px+dx&&Math.round(p.y||0)===py+dy){
+    if(p.name!==me&&(p.mapId||'overworld')==='overworld'&&Math.round(p.x||0)===px+dx&&Math.round(p.y||0)===py+dy){
       const t=TEAM.find(tt=>tt.name===p.name);
       showT(`${p.name} (${t?t.pokemon:'?'})`);
       document.getElementById('text-box').innerHTML+=`<div style="display:flex;gap:6px;margin-top:4px"><button class="choice-btn" onclick="window._ch('${p.name}')">⚔️ Combat</button><button class="choice-btn" onclick="window._ct('${p.name}')">💬 Parler</button></div>`;
@@ -187,7 +430,7 @@ window._ch=n=>{sk.emit('battle:challenge',{target:n});showT('Demande...');};
 window._ct=n=>{showT(`${n}: Bonne rétro !`);setTimeout(hideT,2e3);};
 function pressB(){window._close();hideT();}
 
-// ═══ CANVAS BATTLE ENGINE (matching battle.js from pokemon-js) ═══
+// ═══ CANVAS BATTLE ENGINE ═══
 const battle={
   overlay:null,canvas:null,ctx:null,msgEl:null,movesEl:null,
   active:false,animFrame:null,
@@ -214,10 +457,8 @@ const battle={
     this.flashTimer=0;this.flashTarget=null;this.shakeX=0;
     this.movesEl.innerHTML='';this.msgEl.textContent='';
     playBt();
-    // Load sprites
     this.mySprite=new Image();this.mySprite.crossOrigin='anonymous';this.mySprite.src=SPB(myT.pokeId);
     this.oppSprite=new Image();this.oppSprite.crossOrigin='anonymous';this.oppSprite.src=SP(oppId);
-    // Show overlay with transition
     this.overlay.classList.add('active');
     this._resize();
     this.entryPhase='flash';this.entryAnim=0;
@@ -244,7 +485,6 @@ const battle={
 
   _drawLoop(){
     if(!this.active)return;
-    // Re-measure in case of resize
     const w=this.canvas.clientWidth,h=this.canvas.clientHeight;
     if(w!==this.cw||h!==this.ch)this._resize();
     this._drawScene();
@@ -254,7 +494,7 @@ const battle={
   _drawScene(){
     const ctx=this.ctx,w=this.cw,h=this.ch;
     if(w<=0||h<=0)return;ctx.clearRect(0,0,w,h);
-    const S=Math.min(w/400,h/240,2); // scale factor, 400x240 is reference
+    const S=Math.min(w/400,h/240,2);
     if(this.entryPhase==='flash'){
       this.entryAnim+=.06;
       ctx.fillStyle=Math.sin(this.entryAnim*10)>0?'#fff':'#000';
@@ -266,9 +506,9 @@ const battle={
     ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
     // Ground shadows
     ctx.fillStyle='rgba(0,0,0,.10)';
-    ctx.beginPath();ctx.ellipse(w*.72,h*.42,w*.15,h*.05,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(w*.70,h*.44,w*.16,h*.06,0,0,Math.PI*2);ctx.fill();
     ctx.beginPath();ctx.ellipse(w*.28,h*.72,w*.14,h*.045,0,0,Math.PI*2);ctx.fill();
-    // Grass
+    // Grass detail
     ctx.fillStyle='rgba(80,140,60,.15)';
     for(let i=0;i<8;i++)ctx.fillRect(i*w/8+4*S,h*.50+Math.sin(i*1.5)*6*S,12*S,2*S);
 
@@ -279,27 +519,29 @@ const battle={
     }
     if(this.flashTimer>0){this.flashTimer--;this.shakeX=this.flashTimer>12?(this.flashTimer%2===0?4*S:-4*S):0;}
 
-    // Opponent sprite — upper right, size scales with canvas
-    const os=Math.min(w*.22,h*.38,80*S);
+    // ─── OPPONENT SPRITE (upper right, BIGGER & better positioned) ───
+    const os=Math.min(w*.30,h*.50,110*S);
     if(this.oppSprite?.complete&&this.oppSprite.naturalWidth>0&&this.oppHpCur>0){
-      const ox=w*.62+oppOff+(this.flashTarget==='opp'?this.shakeX:0),oy=h*.06;
+      const ox=w*.58+oppOff+(this.flashTarget==='opp'?this.shakeX:0);
+      const oy=h*.42-os; // position so bottom of sprite sits on ground platform
       if(this.flashTarget==='opp'&&this.flashTimer>0&&this.flashTimer%4<2)ctx.globalAlpha=.3;
+      ctx.imageSmoothingEnabled=false;
       ctx.drawImage(this.oppSprite,ox,oy,os,os);ctx.globalAlpha=1;
     }
-    // Catch ball
+    // Catch ball (during catch animation)
     if(this.catchBallImg?.complete&&this.catchBallImg.naturalWidth>0&&this.oppHpCur>0){
-      ctx.drawImage(this.catchBallImg,w*.65,h*.12,20*S,20*S);
+      ctx.drawImage(this.catchBallImg,w*.65,h*.15,20*S,20*S);
     }
-    // Player sprite — lower left, bigger
+    // ─── PLAYER SPRITE (lower left, big back view) ───
     const ms=Math.min(w*.28,h*.48,100*S);
     if(this.mySprite?.complete&&this.mySprite.naturalWidth>0&&this.myHpCur>0){
       const mx=w*.06+myOff+(this.flashTarget==='my'?this.shakeX:0),my=h*.40;
       if(this.flashTarget==='my'&&this.flashTimer>0&&this.flashTimer%4<2)ctx.globalAlpha=.3;
+      ctx.imageSmoothingEnabled=false;
       ctx.drawImage(this.mySprite,mx,my,ms,ms);ctx.globalAlpha=1;
     }
-    // HP bars — scale with canvas
+    // HP bars
     const bw=Math.min(w*.44,180*S);
-    const pH=Math.round(14*S); // panel text size
     this._drawHP(ctx,4*S,4*S,bw,S,this.oppPk?.name||'???',this.oppHpCur,this.oppHpMax,false,this.oppPk?.lv||50);
     this._drawHP(ctx,w-bw-4*S,h*.56,bw,S,this.myPk?.name||'???',this.myHpCur,this.myHpMax,true,50);
   },
@@ -308,30 +550,23 @@ const battle={
     const ph=showExact?Math.round(48*S):Math.round(38*S);
     const fs1=Math.round(10*S),fs2=Math.round(7*S),fs3=Math.round(6*S),fs4=Math.round(8*S);
     const pad=Math.round(6*S),barTop=Math.round(20*S),barH=Math.round(10*S);
-    // Panel
     ctx.fillStyle='#f8f0d8';
     ctx.beginPath();ctx.roundRect(x,y,w,ph,4*S);ctx.fill();
     ctx.strokeStyle='#484848';ctx.lineWidth=Math.max(1,1.5*S);
     ctx.beginPath();ctx.roundRect(x,y,w,ph,4*S);ctx.stroke();
-    // Dark HP area
     ctx.fillStyle='#484848';ctx.fillRect(x+pad,y+barTop,w-pad*2,barH+2*S);
-    // Name
     ctx.font=`bold ${fs1}px "PressStart2P","Press Start 2P",monospace`;ctx.fillStyle='#303030';ctx.textAlign='left';
     ctx.fillText(name.toUpperCase(),x+pad,y+barTop-Math.round(3*S));
-    // Level
     ctx.font=`${fs2}px "PressStart2P","Press Start 2P",monospace`;ctx.fillStyle='#606060';ctx.textAlign='right';
     ctx.fillText(':L'+lv,x+w-pad,y+barTop-Math.round(3*S));
-    // HP label
     ctx.font=`bold ${fs3}px "PressStart2P","Press Start 2P",monospace`;ctx.fillStyle='#f8d030';ctx.textAlign='left';
     ctx.fillText('HP',x+pad,y+barTop+barH-Math.round(1*S));
-    // HP bar fill
-    const bx=x+pad+Math.round(22*S),by=y+barTop+Math.round(1*S),bw=w-pad*2-Math.round(24*S),bh=barH;
-    ctx.fillStyle='#282828';ctx.fillRect(bx,by,bw,bh);
+    const bx=x+pad+Math.round(22*S),by=y+barTop+Math.round(1*S),bww=w-pad*2-Math.round(24*S),bh=barH;
+    ctx.fillStyle='#282828';ctx.fillRect(bx,by,bww,bh);
     const pct=maxHp>0?Math.max(0,hp/maxHp):0;
     const hc=pct>.5?'#30d848':pct>.2?'#f8c830':'#f03030';
-    if(pct>0){ctx.fillStyle=hc;ctx.fillRect(bx,by,bw*pct,bh);
-      ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(bx,by,bw*pct,Math.round(bh*.35));}
-    // Exact HP
+    if(pct>0){ctx.fillStyle=hc;ctx.fillRect(bx,by,bww*pct,bh);
+      ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(bx,by,bww*pct,Math.round(bh*.35));}
     if(showExact){ctx.font=`${fs4}px "PressStart2P","Press Start 2P",monospace`;ctx.fillStyle='#303030';ctx.textAlign='right';
       ctx.fillText(`${Math.max(0,hp)} / ${maxHp}`,x+w-pad,y+barTop+barH+Math.round(12*S));}
     ctx.textAlign='left';
@@ -386,7 +621,6 @@ const battle={
     }else{this.myHpCur=Math.min(this.myHpMax,this.myHpCur+Math.floor(this.myHpMax*.4));this._msg('PV récupérés !');}
     await this._wait(800);
     if(this.oppHpCur<=0){this._msg(`${this.oppPk.name.toUpperCase()} est K.O. !`);await this._wait(1500);this.close();return;}
-    // Enemy turn
     const em=this.oppPk.moves[Math.floor(Math.random()*this.oppPk.moves.length)];
     this._msg(`${this.oppPk.name.toUpperCase()} utilise ${em.n} !`);
     await this._wait(600);
@@ -404,7 +638,6 @@ const battle={
     const rate=.3+(1-this.oppHpCur/this.oppHpMax)*.5;
     const caught=Math.random()<rate;
     const shakes=caught?3:Math.floor(Math.random()*3)+1;
-    // Ball open animation
     for(let f=0;f<5;f++){
       this.catchBallImg=new Image();this.catchBallImg.src=BALL[f];
       this.oppSprite=this.catchBallImg;
@@ -415,7 +648,6 @@ const battle={
     const left=new Image();left.src=BALL_L;
     const right=new Image();right.src=BALL_R;
     this.oppSprite=idle;
-    // Shake animation
     for(let s=0;s<shakes;s++){
       await this._wait(800);
       this.oppSprite=left;await this._wait(150);
@@ -430,12 +662,10 @@ const battle={
       if(!catches.includes(this.oppPk.id))catches.push(this.oppPk.id);
       await this._wait(2000);this.close();
     }else{
-      // Break free
       this.oppSprite=new Image();this.oppSprite.crossOrigin='anonymous';this.oppSprite.src=SP(this.oppPk.id);
       this.flashTarget='opp';this.flashTimer=24;
       this._msg('Raté ! Il s\'est échappé !');
       await this._wait(1200);
-      // Enemy counterattack
       const em=this.oppPk.moves[Math.floor(Math.random()*this.oppPk.moves.length)];
       this._msg(`${this.oppPk.name.toUpperCase()} utilise ${em.n} !`);
       await this._wait(600);
@@ -489,7 +719,6 @@ function resolvePvp(d){
   const run=async()=>{
     const a=meF?{m:myMv,me:true}:{m:opMv,me:false};
     const b=meF?{m:opMv,me:false}:{m:myMv,me:true};
-    // Turn 1
     const src1=a.me?pk:pvpPk, tgt1=a.me?pvpPk:pk;
     battle._msg(`${src1.name.toUpperCase()} utilise ${a.m.n} !`);
     await battle._wait(600);
@@ -503,7 +732,6 @@ function resolvePvp(d){
       battle._msg(battle.oppHpCur<=0?'Victoire ! 🎉':'Défaite...');
       sk.emit('battle:end',{battleId:batId,winner:w||(Object.values(pls).find(p=>p.name!==me)?.name)});return;
     }
-    // Turn 2
     const src2=b.me?pk:pvpPk,tgt2=b.me?pvpPk:pk;
     battle._msg(`${src2.name.toUpperCase()} utilise ${b.m.n} !`);
     await battle._wait(600);
@@ -525,23 +753,30 @@ function startWild(){
   let r=Math.random()*100,c=0,eid=16;for(const e of ENC){c+=e.ch;if(r<c){eid=e.id;break;}}
   const ep=PD[eid];if(!ep)return;
   const lv=ELV[Math.floor(Math.random()*ELV.length)];
-  const oppData={...ep,baseHp:ep.hp-60,id:eid,lv}; // baseHp = reverse the formula
+  const oppData={...ep,baseHp:ep.hp-60,id:eid,lv};
   battle.start(PD[myT.pokeId],oppData,eid,lv,false,null);
 }
 function startPvp(d){
-  pvpPk=PD[d.oppPokeId]||{name:'???',hp:130,atk:80,def:70,spa:80,spd:70,speed:70,types:['Normal'],moves:[{n:'Tackle',p:40,a:100,t:'Normal',c:'phy'}]};
+  pvpPk=PD[d.oppPokeId]||{name:'???',hp:130,atk:80,def:70,spa:80,spd:70,speed:70,types:['Normal'],moves:[{n:'Charge',p:40,a:100,t:'Normal',c:'phy'}]};
   battle.start(PD[myT.pokeId],{...pvpPk,baseHp:999},d.oppPokeId,50,true,d.opp);
 }
 
 // ═══ HUD ═══
 function updHUD(){
   if(!myT)return;const h=document.getElementById('hud');
+  // Show current location
+  let locName='';
+  if(curMap!=='overworld'){
+    const bld=BUILDINGS[curMap];
+    const names={'pokemon-center':'Centre Pokémon','gym':'Arène Pokémon','poke-mart':'PokéMart','museum-1f':'Musée 1F','npc-house-b':'Maison','npc-house-a':'Maison'};
+    locName=`<span style="font-size:5px;color:#FFD93D;background:rgba(0,0,0,.3);padding:1px 4px;border-radius:3px">📍${names[curMap]||curMap}</span>`;
+  }
   let bt=ZONES.map(z=>{const o=openA[z.id];return `<button class="hb" onclick="window._oz('${z.id}')" style="background:${o?z.color:'#555'}">${o?'':'🔒'}${z.icon}</button>`;}).join('');
   bt+=`<button class="hb" onclick="window._dex()">📖</button>`;
   bt+=`<button class="hb" onclick="window._ov()">🏆</button>`;
   if(isA)bt+=`<button class="hb" onclick="window._oa()" style="background:#c0392b">PO</button>`;
   const dots=Object.values(pls).filter(p=>p.name!==me).map(p=>{const t=TEAM.find(tt=>tt.name===p.name);return `<div class="hd" style="background:${t?t.color:'#888'}" title="${p.name}"></div>`;}).join('');
-  h.innerHTML=`<img src="${SP(myT.pokeId)}" style="width:18px;height:18px"><span style="color:${myT.color};font-size:7px">${me}</span><span style="font-size:6px;color:#aaa">❤${myHp>0?myHp:myMx} 📖${catches.length}</span>${bt}<div style="margin-left:auto;display:flex;gap:3px">${dots}</div>`;
+  h.innerHTML=`<img src="${SP(myT.pokeId)}" style="width:18px;height:18px"><span style="color:${myT.color};font-size:7px">${me}</span><span style="font-size:6px;color:#aaa">❤${myHp>0?myHp:myMx} 📖${catches.length}</span>${locName}${bt}<div style="margin-left:auto;display:flex;gap:3px">${dots}</div>`;
 }
 
 // ═══ POKEDEX ═══
@@ -557,7 +792,7 @@ window._dex=function(){
   <div style="font-size:8px;color:#FFD93D;margin-bottom:6px">🏆 Classement PvP</div>${
     Object.entries(pvpWins).sort((a,b)=>b[1]-a[1]).map(([n,w],i)=>{
       const t=TEAM.find(tt=>tt.name===n);
-      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:8px;color:#ccc"><span style="color:#FFD93D;width:16px">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</span><img src="${SP(t?.pokeId||25)}" style="width:16px;height:16px"><span style="color:${t?.color||'#fff'}">${esc(n)}</span><span style="margin-left:auto">${w} win${w>1?'s':''}</span></div>`;
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:8px;color:#ccc"><span style="color:#FFD93D;width:16px">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</span><img src="${SP(t?.pokeId||25)}" style="width:16px;height:16px"><span style="color:${t?.color||'#fff'}">${esc(n)}</span><span style="margin-left:auto">${w} victoire${w>1?'s':''}</span></div>`;
     }).join('')||'<p style="color:#555;font-size:7px">Aucun combat</p>'
   }</div>
   <div style="margin-top:8px;padding:8px;background:rgba(255,255,255,.04);border-radius:6px">
@@ -610,7 +845,7 @@ window._oa=function(){
   p.onclick=ev=>{if(ev.target===p)p.classList.remove('open');};
 };
 
-// ═══ CLOSE ALL PANELS (exposed on window) ═══
+// ═══ CLOSE ALL PANELS ═══
 window._close=function(){['zone-panel','vote-panel','admin-panel'].forEach(id=>document.getElementById(id).classList.remove('open'));};
 
 })();

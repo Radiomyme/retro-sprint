@@ -1,6 +1,5 @@
 const express=require('express'),http=require('http'),{Server}=require('socket.io'),path=require('path');
 const app=express(),server=http.createServer(app);
-// IMPORTANT: polling first, then upgrade to websocket (required for Render/cloud proxies)
 const io=new Server(server,{
   cors:{origin:'*',methods:['GET','POST']},
   transports:['polling','websocket'],
@@ -15,7 +14,6 @@ app.get('/health',(req,res)=>res.json({ok:true,players:Object.keys(S.players).le
 console.log('Server starting...');
 
 const TEAM={'Bryan':{pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},'Jérémy':{pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'b'},'Louis':{pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'c'},'Thomas':{pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},'Dylan':{pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},'Martin':{pokemon:'Léviator',pokeId:130,color:'#2980B9',sprite:'f'},'Lucas':{pokemon:'Tortipouss',pokeId:387,color:'#27AE60',sprite:'g'}};
-const ZONES=[{id:'kanto'},{id:'johto'},{id:'hoenn'},{id:'league'}];
 
 const S={players:{},cards:[],votes:{},phase:'free',
   openArenas:{kanto:false,johto:false,hoenn:false,league:false},
@@ -29,7 +27,7 @@ io.on('connection',socket=>{
   socket.on('join',({name,isAdmin})=>{
     const td=TEAM[name];if(!td){console.log('✗ Unknown player:',name);return;}
     console.log('✓ Joined:',name);
-    const p={id:socket.id,name,...td,isAdmin:!!isAdmin,x:19,y:26,dir:'down'};
+    const p={id:socket.id,name,...td,isAdmin:!!isAdmin,x:19,y:26,dir:'down',mapId:'overworld'};
     S.players[socket.id]=p;
     if(!S.playerHp[name])S.playerHp[name]=-1;
     if(!S.catches[name])S.catches[name]=[];
@@ -38,7 +36,19 @@ io.on('connection',socket=>{
     socket.broadcast.emit('player:joined',p);
   });
 
-  socket.on('move',({x,y,dir})=>{const p=S.players[socket.id];if(!p)return;p.x=x;p.y=y;p.dir=dir;socket.broadcast.emit('player:moved',{id:socket.id,x,y,dir});});
+  socket.on('move',({x,y,dir,mapId})=>{
+    const p=S.players[socket.id];if(!p)return;
+    p.x=x;p.y=y;p.dir=dir;
+    if(mapId!==undefined)p.mapId=mapId;
+    socket.broadcast.emit('player:moved',{id:socket.id,x,y,dir,mapId:p.mapId});
+  });
+
+  socket.on('changeMap',({mapId,x,y,dir})=>{
+    const p=S.players[socket.id];if(!p)return;
+    p.mapId=mapId;p.x=x;p.y=y;p.dir=dir||'down';
+    socket.broadcast.emit('player:mapChanged',{id:socket.id,mapId,x,y,dir:p.dir});
+  });
+
   socket.on('card:add',({zone,text})=>{const p=S.players[socket.id];if(!p||!text.trim())return;S.cards.push({id:`c${Date.now()}`,zone,author:p.name,text:text.trim(),time:Date.now()});io.emit('cards:update',S.cards);updBadges(p.name);});
   socket.on('vote:submit',({ranking})=>{const p=S.players[socket.id];if(!p)return;S.votes[p.name]=ranking;io.emit('votes:update',S.votes);});
   socket.on('admin:arena',({zone,open})=>{const p=S.players[socket.id];if(!p||!p.isAdmin)return;S.openArenas[zone]=open;io.emit('arenas:update',S.openArenas);});
@@ -49,7 +59,6 @@ io.on('connection',socket=>{
   socket.on('heal',()=>{const p=S.players[socket.id];if(!p)return;S.playerHp[p.name]=-1;socket.emit('healed');});
   socket.on('saveHp',({hp})=>{const p=S.players[socket.id];if(!p)return;S.playerHp[p.name]=hp;});
 
-  // Catch tracking
   socket.on('pokemon:caught',({pokeId})=>{
     const p=S.players[socket.id];if(!p)return;
     if(!S.catches[p.name])S.catches[p.name]=[];
@@ -57,7 +66,6 @@ io.on('connection',socket=>{
     io.emit('catches:update',{name:p.name,catches:S.catches[p.name],allCatches:S.catches});
   });
 
-  // PvP
   socket.on('battle:challenge',({target})=>{const p=S.players[socket.id];if(!p)return;const tid=fSid(target);if(!tid)return;io.to(tid).emit('battle:challenged',{from:p.name,fromId:socket.id});});
   socket.on('battle:accept',({challengerId})=>{
     const me=S.players[socket.id],opp=S.players[challengerId];if(!me||!opp)return;
@@ -75,15 +83,9 @@ io.on('connection',socket=>{
     io.to(b.p2id).emit('battle:resolve',{battleId,p1move:b.p1move,p2move:b.p2move});
     b.p1move=null;b.p2move=null;
   });
-  // Battle end: notify BOTH players
   socket.on('battle:end',({battleId,winner})=>{
     const b=S.battles[battleId];if(!b)return;
-    if(winner){
-      if(!S.pvpWins[winner])S.pvpWins[winner]=0;
-      S.pvpWins[winner]++;
-      io.emit('pvp:update',S.pvpWins);
-    }
-    // Notify both players to exit battle
+    if(winner){if(!S.pvpWins[winner])S.pvpWins[winner]=0;S.pvpWins[winner]++;io.emit('pvp:update',S.pvpWins);}
     io.to(b.p1id).emit('battle:finished',{battleId,winner});
     io.to(b.p2id).emit('battle:finished',{battleId,winner});
     delete S.battles[battleId];

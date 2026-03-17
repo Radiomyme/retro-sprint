@@ -38,6 +38,9 @@ img{image-rendering:pixelated}
 .psp img{image-rendering:pixelated}
 .plbl{position:absolute;font-size:7px;color:#fff;text-shadow:1px 1px 0 #000,-1px 1px 0 #000;white-space:nowrap;text-align:center;bottom:100%;left:50%;transform:translateX(-50%)}
 
+/* Hotspot pulsing animation */
+@keyframes hsPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+
 #bottom-panel{position:absolute;bottom:0;left:0;width:100%;display:flex;flex-direction:column}
 #text-box{background:var(--bg);padding:6px 10px;font-size:11px;color:#181010;line-height:1.5;min-height:40px;display:none;border-image:url('/styles/images/frame.png') 7 round;border-width:7px;border-style:solid}
 .choice-btn{font-family:inherit;font-size:9px;padding:3px 8px;border:2px solid #181010;border-radius:3px;background:var(--bg);cursor:pointer}
@@ -55,7 +58,7 @@ img{image-rendering:pixelated}
 .mbtn{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
 .mb{font-size:6px;color:rgba(160,160,180,.7);background:rgba(40,40,60,.8);border:1px solid rgba(80,80,100,.3);border-radius:8px;padding:3px 10px;cursor:pointer}
 
-#hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;padding:3px 6px;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent);z-index:20;gap:4px;font-size:7px;color:#fff}
+#hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;padding:3px 6px;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent);z-index:20;gap:4px;font-size:7px;color:#fff;flex-wrap:wrap}
 #hud img{width:18px;height:18px}
 .hb{font-size:7px;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:2px 6px;cursor:pointer;font-family:inherit}
 .hd{width:7px;height:7px;border-radius:50%;border:1px solid rgba(255,255,255,.3)}
@@ -81,44 +84,6 @@ img{image-rendering:pixelated}
   #battle-msg{font-size:14px;padding:10px 16px}
   #battle-moves button{font-size:11px;padding:8px}
 }
-
-
-.bstr,.bstl{position:absolute;inset:0}
-.bstr{background:repeating-linear-gradient(0deg,transparent 0%,transparent 5%,#000 5%,#000 10%);transform:translateX(100%);animation:bsl 1.2s linear forwards}
-.bstl{background:repeating-linear-gradient(0deg,#000 0%,#000 5%,transparent 5%,transparent 10%);transform:translateX(-100%);animation:bsr 1.2s linear forwards}
-@keyframes bsl{to{transform:translateX(0)}}
-@keyframes bsr{to{transform:translateX(0)}}
-
-#battle-scene{flex:1;position:relative;background:linear-gradient(180deg,#78b8e8 0%,#a0d0f0 38%,#68a848 38%,#508838 100%);overflow:hidden}
-.bi{position:absolute;z-index:5;background:var(--bg);border-image:url('/styles/images/frame.png') 7 round;border-width:5px;border-style:solid;padding:2px 5px}
-.bi.en{top:3%;left:2%}.bi.pl{bottom:3%;right:2%}
-.bn{font-size:10px;color:#303030;text-transform:uppercase}.blv{font-size:9px;color:#606060;margin-left:6px}
-.bhp{position:relative;margin-top:1px}.bhp img{height:6px;display:block}
-.bhpi{position:absolute;top:23%;right:1.5%;width:75.2%;height:46%}
-.bhpf{height:100%;transition:width .8s ease-out}
-.bht{font-size:7px;color:#303030;text-align:right;margin-top:1px}
-
-.bs{position:absolute;z-index:2}
-.bs.en{top:5%;right:10%;width:22%;max-width:100px}
-.bs.pl{bottom:6%;left:5%;width:28%;max-width:130px}
-.bs img{width:100%;display:block}
-.bs.si img{animation:sfl 1.3s linear forwards}
-.bs.pl.si img{animation:sfr 1.3s linear forwards}
-@keyframes sfl{from{transform:translateX(-500%)}to{transform:translateX(0)}}
-@keyframes sfr{from{transform:translateX(500%)}to{transform:translateX(0)}}
-.bs.atkr img{animation:ar .5s linear}
-.bs.atkl img{animation:al .5s linear}
-@keyframes ar{0%,100%{transform:translateX(0)}50%{transform:translateX(50%)}}
-@keyframes al{0%,100%{transform:translateX(0)}50%{transform:translateX(-50%)}}
-.bs.fl img{animation:fla .5s linear}
-@keyframes fla{0%{opacity:1}10%{opacity:0}20%{opacity:1}30%{opacity:0}40%{opacity:1}50%{opacity:0}60%{opacity:1}70%{opacity:0}80%{opacity:1}90%{opacity:0}100%{opacity:1}}
-
-#battle-bottom{position:relative;height:20%;min-height:56px}
-#battle-text{position:absolute;inset:0;background:var(--bg);border-image:url('/styles/images/frame.png') 7 round;border-width:7px;border-style:solid;padding:5px 8px;font-size:11px;color:#181010;display:flex;align-items:flex-start}
-#battle-menu{position:absolute;right:0;top:0;bottom:0;width:44%;display:none;grid-template-columns:1fr 1fr;background:var(--bg);border-image:url('/styles/images/frame.png') 7 round;border-width:7px;border-style:solid;z-index:5}
-#battle-menu.show{display:grid}
-#battle-menu button{font-size:9px;font-family:'PokemonGB',monospace;padding:3px 4px;background:transparent;border:none;color:#181010;cursor:pointer;text-align:left}
-#battle-menu button:active{background:#d8d0c0}
 
 .overlay-panel{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;background:rgba(0,0,0,.92);font-family:'PokemonGB',monospace}
 .overlay-panel.open{display:flex}
