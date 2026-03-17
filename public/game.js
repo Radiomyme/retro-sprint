@@ -457,8 +457,12 @@ const battle={
     this.flashTimer=0;this.flashTarget=null;this.shakeX=0;
     this.movesEl.innerHTML='';this.msgEl.textContent='';
     playBt();
-    this.mySprite=new Image();this.mySprite.crossOrigin='anonymous';this.mySprite.src=SPB(myT.pokeId);
-    this.oppSprite=new Image();this.oppSprite.crossOrigin='anonymous';this.oppSprite.src=SP(oppId);
+    this.mySprite=new Image();this.mySprite.crossOrigin='anonymous';
+    this.mySprite.onerror=()=>{this.mySprite=new Image();this.mySprite.crossOrigin='anonymous';this.mySprite.src=SP(myT.pokeId);};
+    this.mySprite.src=SPB(myT.pokeId);
+    this.oppSprite=new Image();this.oppSprite.crossOrigin='anonymous';
+    this.oppSprite.onerror=()=>{this.oppSprite=new Image();this.oppSprite.src=`/assets/pokemon/front/${oppId}.png`;};
+    this.oppSprite.src=SP(oppId);
     this.overlay.classList.add('active');
     this._resize();
     this.entryPhase='flash';this.entryAnim=0;
@@ -662,7 +666,9 @@ const battle={
       if(!catches.includes(this.oppPk.id))catches.push(this.oppPk.id);
       await this._wait(2000);this.close();
     }else{
-      this.oppSprite=new Image();this.oppSprite.crossOrigin='anonymous';this.oppSprite.src=SP(this.oppPk.id);
+      this.oppSprite=new Image();this.oppSprite.crossOrigin='anonymous';
+      this.oppSprite.onerror=()=>{this.oppSprite=new Image();this.oppSprite.src=`/assets/pokemon/front/${this.oppPk.id}.png`;};
+      this.oppSprite.src=SP(this.oppPk.id);
       this.flashTarget='opp';this.flashTimer=24;
       this._msg('Raté ! Il s\'est échappé !');
       await this._wait(1200);
