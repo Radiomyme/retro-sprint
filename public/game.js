@@ -2,10 +2,6 @@
  'use strict';
  const SP=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
  const SPB=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`;
- // Fallback sprite sources for pokemon that may not be on PokeAPI (Gen 9 etc)
- const SP2=id=>`https://img.pokemondb.net/sprites/home/normal/${id}.png`; // by name, handled below
- const SPL=id=>`/assets/pokemon/front/${id}.png`; // local sprite
- const SPLB=id=>`/assets/pokemon/back/${id}.png`; // local back sprite
 
  // Robust sprite loader: tries sources in order until one works
  function loadImg(sources,cb){
@@ -13,7 +9,7 @@
    function tryNext(){
      if(i>=sources.length){if(cb)cb(null);return;}
      const img=new Image();img.crossOrigin='anonymous';
-     img.onload=()=>{if(img.naturalWidth>0){if(cb)cb(img);}else tryNext();};
+     img.onload=()=>{if(img.naturalWidth>1){if(cb)cb(img);}else{i++;tryNext();}};
      img.onerror=()=>{i++;tryNext();};
      img.src=sources[i];i++;
    }
@@ -474,10 +470,10 @@
      this.flashTimer=0;this.flashTarget=null;this.shakeX=0;
      this.movesEl.innerHTML='';this.msgEl.textContent='';
      playBt();
-     // Load sprites with fallback chain
+     // Load sprites - CDN only, no local placeholders (they're just colored balls)
      this.mySprite=null;this.oppSprite=null;
-     loadImg([SPB(myT.pokeId),SP(myT.pokeId),SPLB(myT.pokeId),SPL(myT.pokeId)],img=>{this.mySprite=img;});
-     loadImg([SP(oppId),SPL(oppId)],img=>{this.oppSprite=img;});
+     loadImg([SPB(myT.pokeId),SP(myT.pokeId)],img=>{this.mySprite=img;});
+     loadImg([SP(oppId)],img=>{this.oppSprite=img;});
      this.overlay.classList.add('active');
      this._resize();
      this.entryPhase='flash';this.entryAnim=0;
@@ -523,10 +519,10 @@
      const bg=ctx.createLinearGradient(0,0,0,h);
      bg.addColorStop(0,'#78b8e8');bg.addColorStop(.35,'#a0d0f0');bg.addColorStop(.38,'#68a848');bg.addColorStop(1,'#508838');
      ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-     // Ground shadows
+     // Ground shadows (under each pokemon)
      ctx.fillStyle='rgba(0,0,0,.10)';
-     ctx.beginPath();ctx.ellipse(w*.72,h*.46,w*.22,h*.08,0,0,Math.PI*2);ctx.fill();
-     ctx.beginPath();ctx.ellipse(w*.20,h*.88,w*.22,h*.07,0,0,Math.PI*2);ctx.fill();
+     ctx.beginPath();ctx.ellipse(w*.72,h*.46,w*.16,h*.05,0,0,Math.PI*2);ctx.fill();
+     ctx.beginPath();ctx.ellipse(w*.22,h*.92,w*.20,h*.06,0,0,Math.PI*2);ctx.fill();
      // Grass detail
      ctx.fillStyle='rgba(80,140,60,.15)';
      for(let i=0;i<8;i++)ctx.fillRect(i*w/8+4*S,h*.50+Math.sin(i*1.5)*6*S,12*S,2*S);
@@ -538,23 +534,24 @@
      }
      if(this.flashTimer>0){this.flashTimer--;this.shakeX=this.flashTimer>12?(this.flashTimer%2===0?4*S:-4*S):0;}
 
-     // ─── OPPONENT SPRITE (upper right, large & well positioned) ───
-     const os=Math.min(w*.40,h*.72);
+     // ─── OPPONENT SPRITE (upper right, smaller = "far away") ───
+     // Must fit between top padding and ground platform (h*.46)
+     const os=Math.min(w*.28,h*.40);
      if(this.oppSprite?.complete&&this.oppSprite.naturalWidth>0&&this.oppHpCur>0){
-       const ox=w*.55+oppOff+(this.flashTarget==='opp'?this.shakeX:0);
-       const oy=h*.46-os; // bottom of sprite sits on ground platform
+       const ox=w*.60+oppOff+(this.flashTarget==='opp'?this.shakeX:0);
+       const oy=h*.46-os; // bottom sits on ground platform, top stays visible
        if(this.flashTarget==='opp'&&this.flashTimer>0&&this.flashTimer%4<2)ctx.globalAlpha=.3;
        ctx.imageSmoothingEnabled=false;
        ctx.drawImage(this.oppSprite,ox,oy,os,os);ctx.globalAlpha=1;
      }
      // Catch ball (during catch animation)
      if(this.catchBallImg?.complete&&this.catchBallImg.naturalWidth>0&&this.oppHpCur>0){
-       ctx.drawImage(this.catchBallImg,w*.68,h*.12,24*S,24*S);
+       ctx.drawImage(this.catchBallImg,w*.68,h*.18,20*S,20*S);
      }
-     // ─── PLAYER SPRITE (lower left, large back view) ───
-     const ms=Math.min(w*.40,h*.72);
+     // ─── PLAYER SPRITE (lower left, bigger = "close up") ───
+     const ms=Math.min(w*.38,h*.60);
      if(this.mySprite?.complete&&this.mySprite.naturalWidth>0&&this.myHpCur>0){
-       const mx=w*.02+myOff+(this.flashTarget==='my'?this.shakeX:0),my=h*.88-ms;
+       const mx=w*.03+myOff+(this.flashTarget==='my'?this.shakeX:0),my=h*.92-ms;
        if(this.flashTarget==='my'&&this.flashTimer>0&&this.flashTimer%4<2)ctx.globalAlpha=.3;
        ctx.imageSmoothingEnabled=false;
        ctx.drawImage(this.mySprite,mx,my,ms,ms);ctx.globalAlpha=1;
@@ -562,7 +559,7 @@
      // HP bars
      const bw=Math.min(w*.44,180*S);
      this._drawHP(ctx,4*S,4*S,bw,S,this.oppPk?.name||'???',this.oppHpCur,this.oppHpMax,false,this.oppPk?.lv||50);
-     this._drawHP(ctx,w-bw-4*S,h*.50,bw,S,this.myPk?.name||'???',this.myHpCur,this.myHpMax,true,50);
+     this._drawHP(ctx,w-bw-4*S,h*.52,bw,S,this.myPk?.name||'???',this.myHpCur,this.myHpMax,true,50);
    },
 
    _drawHP(ctx,x,y,w,S,name,hp,maxHp,showExact,lv){
@@ -681,7 +678,7 @@
        if(!catches.includes(this.oppPk.id))catches.push(this.oppPk.id);
        await this._wait(2000);this.close();
      }else{
-       loadImg([SP(this.oppPk.id),SPL(this.oppPk.id)],img=>{this.oppSprite=img;});
+       loadImg([SP(this.oppPk.id)],img=>{this.oppSprite=img;});
        this.flashTarget='opp';this.flashTimer=24;
        this._msg('Raté ! Il s\'est échappé !');
        await this._wait(1200);
