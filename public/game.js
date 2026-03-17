@@ -487,8 +487,14 @@
      this.movesEl.innerHTML='';this.msgEl.textContent='';
      playBt();
      // Load sprites - CDN only, no local placeholders (they're just colored balls)
+     // Gen 9+ pokemon (id > 905) have no back sprites on PokeAPI → use front for both
      this.mySprite=null;this.oppSprite=null;
-     loadImg([SPB(myT.pokeId),SP(myT.pokeId)],img=>{this.mySprite=img;});
+     const myId=myT.pokeId;
+     if(myId>905){
+       loadImg([SP(myId)],img=>{this.mySprite=img;});
+     }else{
+       loadImg([SPB(myId),SP(myId)],img=>{this.mySprite=img;});
+     }
      loadImg([SP(oppId)],img=>{this.oppSprite=img;});
      this.overlay.classList.add('active');
      this._resize();
@@ -637,7 +643,7 @@
      const crit=Math.random()<0.0625?1.5:1;
      const rand=.85+Math.random()*.15;
      const stab=(atkTypes||[]).includes(mv.t)?1.5:1;
-     return{dmg:Math.max(1,Math.floor(base*rand*crit*eff*stab)),eff,crit:crit>1};
+     return{dmg:eff===0?0:Math.max(1,Math.floor(base*rand*crit*eff*stab)),eff,crit:crit>1};
    },
 
    async _doAttack(i){
@@ -656,9 +662,13 @@
      const em=this.oppPk.moves[Math.floor(Math.random()*this.oppPk.moves.length)];
      this._msg(`${this.oppPk.name.toUpperCase()} utilise ${em.n} !`);
      await this._wait(600);
-     const{dmg:ed}=this._calcDmg(this.oppPk,pk,em,this.oppPk.lv||50,this.oppPk.types,pk.types);
-     if(em.p>0){this.myHpCur=Math.max(0,this.myHpCur-ed);this.flashTarget='my';this.flashTimer=24;
-       await this._wait(500);this._msg(`${ed} dégâts !`);}
+     const{dmg:ed,eff:eEff}=this._calcDmg(this.oppPk,pk,em,this.oppPk.lv||50,this.oppPk.types,pk.types);
+     if(em.p>0){
+       if(ed>0){this.myHpCur=Math.max(0,this.myHpCur-ed);this.flashTarget='my';this.flashTimer=24;}
+       await this._wait(500);
+       let emsg=`${ed} dégâts !`;if(eEff>=2)emsg+=' Super efficace !';else if(eEff>0&&eEff<1)emsg+=' Pas très efficace...';else if(eEff===0)emsg='Aucun effet...';
+       this._msg(emsg);
+     }
      await this._wait(800);
      if(this.myHpCur<=0){this._msg(`${pk.name.toUpperCase()} est K.O. !`);await this._wait(1500);this.close();return;}
      this._msg('Que faire ?');this._showActions();
@@ -701,9 +711,11 @@
        const em=this.oppPk.moves[Math.floor(Math.random()*this.oppPk.moves.length)];
        this._msg(`${this.oppPk.name.toUpperCase()} utilise ${em.n} !`);
        await this._wait(600);
-       if(em.p>0){const{dmg:ed}=this._calcDmg(this.oppPk,this.myPk,em,this.oppPk.lv||50,this.oppPk.types,this.myPk.types);
-         this.myHpCur=Math.max(0,this.myHpCur-ed);this.flashTarget='my';this.flashTimer=24;
-         await this._wait(500);this._msg(`${ed} dégâts !`);}
+       if(em.p>0){const{dmg:ed,eff:eEff}=this._calcDmg(this.oppPk,this.myPk,em,this.oppPk.lv||50,this.oppPk.types,this.myPk.types);
+         if(ed>0){this.myHpCur=Math.max(0,this.myHpCur-ed);this.flashTarget='my';this.flashTimer=24;}
+         await this._wait(500);
+         let emsg=`${ed} dégâts !`;if(eEff>=2)emsg+=' Super efficace !';else if(eEff>0&&eEff<1)emsg+=' Pas très efficace...';else if(eEff===0)emsg='Aucun effet...';
+         this._msg(emsg);}
        await this._wait(800);
        if(this.myHpCur<=0){this._msg(`${this.myPk.name.toUpperCase()} est K.O. !`);await this._wait(1500);this.close();return;}
        this._msg('Que faire ?');this._showActions();
@@ -755,9 +767,12 @@
      battle._msg(`${src1.name.toUpperCase()} utilise ${a.m.n} !`);
      await battle._wait(600);
      const{dmg:d1,eff:e1}=battle._calcDmg(src1,tgt1,a.m,50,src1.types,tgt1.types);
-     if(a.m.p>0){if(a.me)battle.oppHpCur=Math.max(0,battle.oppHpCur-d1);else battle.myHpCur=Math.max(0,battle.myHpCur-d1);
-       battle.flashTarget=a.me?'opp':'my';battle.flashTimer=24;await battle._wait(500);
-       let msg=`${d1} dégâts !`;if(e1>=2)msg+=' Super efficace !';battle._msg(msg);}
+     if(a.m.p>0){
+       if(d1>0){if(a.me)battle.oppHpCur=Math.max(0,battle.oppHpCur-d1);else battle.myHpCur=Math.max(0,battle.myHpCur-d1);
+       battle.flashTarget=a.me?'opp':'my';battle.flashTimer=24;}
+       await battle._wait(500);
+       let msg=`${d1} dégâts !`;if(e1>=2)msg+=' Super efficace !';else if(e1>0&&e1<1)msg+=' Pas très efficace...';else if(e1===0)msg='Aucun effet...';
+       battle._msg(msg);}
      await battle._wait(800);
      if(battle.oppHpCur<=0||battle.myHpCur<=0){
        const w=battle.oppHpCur<=0?me:null;
@@ -767,9 +782,13 @@
      const src2=b.me?pk:pvpPk,tgt2=b.me?pvpPk:pk;
      battle._msg(`${src2.name.toUpperCase()} utilise ${b.m.n} !`);
      await battle._wait(600);
-     const{dmg:d2}=battle._calcDmg(src2,tgt2,b.m,50,src2.types,tgt2.types);
-     if(b.m.p>0){if(b.me)battle.oppHpCur=Math.max(0,battle.oppHpCur-d2);else battle.myHpCur=Math.max(0,battle.myHpCur-d2);
-       battle.flashTarget=b.me?'opp':'my';battle.flashTimer=24;await battle._wait(500);battle._msg(`${d2} dégâts !`);}
+     const{dmg:d2,eff:e2}=battle._calcDmg(src2,tgt2,b.m,50,src2.types,tgt2.types);
+     if(b.m.p>0){
+       if(d2>0){if(b.me)battle.oppHpCur=Math.max(0,battle.oppHpCur-d2);else battle.myHpCur=Math.max(0,battle.myHpCur-d2);
+       battle.flashTarget=b.me?'opp':'my';battle.flashTimer=24;}
+       await battle._wait(500);
+       let msg2=`${d2} dégâts !`;if(e2>=2)msg2+=' Super efficace !';else if(e2>0&&e2<1)msg2+=' Pas très efficace...';else if(e2===0)msg2='Aucun effet...';
+       battle._msg(msg2);}
      await battle._wait(800);
      if(battle.oppHpCur<=0||battle.myHpCur<=0){
        const w=battle.oppHpCur<=0?me:null;
