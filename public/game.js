@@ -124,7 +124,7 @@
 
  // Encounters happen on overworld only
  const ENC=[{id:16,ch:10},{id:21,ch:8},{id:19,ch:8},{id:39,ch:6},{id:10,ch:5},{id:27,ch:5},{id:25,ch:5},{id:63,ch:4},{id:35,ch:4},{id:147,ch:3},{id:133,ch:3},{id:37,ch:3},{id:43,ch:3},{id:56,ch:3},{id:66,ch:3},{id:74,ch:3},{id:92,ch:3},{id:48,ch:3},{id:58,ch:2},{id:77,ch:2},{id:100,ch:2},{id:104,ch:2},{id:123,ch:2},{id:129,ch:2},{id:95,ch:1},{id:131,ch:1},{id:142,ch:1},{id:143,ch:1},{id:149,ch:1}];
- const ELV=[15,18,20,22,25];
+ const ELV=[38,40,42,45,48];
  let TYPE_CHART={};
 
  let PD={},me=null,myT=null,sk=null,isA=false;
@@ -654,7 +654,7 @@
    // ─── CATCH ───
    async _doCatch(){
      this.movesEl.innerHTML='';this._msg('Tu lances une POKéBALL !');
-     const rate=.3+(1-this.oppHpCur/this.oppHpMax)*.5;
+     const rate=.45+(1-this.oppHpCur/this.oppHpMax)*.45;
      const caught=Math.random()<rate;
      const shakes=caught?3:Math.floor(Math.random()*3)+1;
      for(let f=0;f<5;f++){
