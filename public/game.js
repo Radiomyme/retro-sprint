@@ -240,8 +240,10 @@
    curMap=bldId;
    px=bld.start.x;py=bld.start.y;dir='up';wf=0;
    sk.emit('changeMap',{mapId:bldId,x:px,y:py,dir});
+   // Dark background for interiors (like original Pokemon)
+   document.getElementById('viewport').style.background='#1a1a2e';
+   document.getElementById('game-screen').style.background='#1a1a2e';
    updateMapDisplay();updMe();updCam();playBldMusic();
-   // Door sound
    const ds=new Audio('/assets/music/enter-door.mp3');ds.volume=.3;ds.play().catch(()=>{});
  }
 
@@ -250,6 +252,9 @@
    const to=bld.exitTo;
    curMap=to.mapId;px=to.x;py=to.y;dir=to.dir||'down';wf=0;
    sk.emit('changeMap',{mapId:curMap,x:px,y:py,dir});
+   // Back to grass green for overworld
+   document.getElementById('viewport').style.background='#48a058';
+   document.getElementById('game-screen').style.background='#48a058';
    updateMapDisplay();updMe();updCam();playBg();
  }
 
@@ -332,9 +337,20 @@
    const vp=document.getElementById('viewport'),w=vp.clientWidth,h=vp.clientHeight;
    const mw=getMapW(),mh=getMapH();
    const mapPxW=mw*TS,mapPxH=mh*TS;
-   const tx=Math.max(0,Math.min(mapPxW-w,px*TS+TS/2-w/2));
-   const ty=Math.max(0,Math.min(mapPxH-h,py*TS+TS/2-h/2));
-   document.getElementById('map-container').style.transform=`translate(${-tx}px,${-ty}px)`;
+   const mc=document.getElementById('map-container');
+   if(curMap!=='overworld'){
+     // Interior zoom: scale map to fill viewport, centered
+     const zoom=Math.min(w/mapPxW,h/mapPxH)*.92;
+     const scaledW=mapPxW*zoom,scaledH=mapPxH*zoom;
+     const offX=(w-scaledW)/2,offY=(h-scaledH)/2;
+     mc.style.transformOrigin='0 0';
+     mc.style.transform=`translate(${offX}px,${offY}px) scale(${zoom})`;
+   }else{
+     const tx=Math.max(0,Math.min(mapPxW-w,px*TS+TS/2-w/2));
+     const ty=Math.max(0,Math.min(mapPxH-h,py*TS+TS/2-h/2));
+     mc.style.transformOrigin='0 0';
+     mc.style.transform=`translate(${-tx}px,${-ty}px)`;
+   }
  }
  function updMe(){
    let el=document.getElementById('me-sp');
