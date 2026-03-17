@@ -574,7 +574,7 @@
      }
      // HP bars
      const bw=Math.min(w*.44,180*S);
-     this._drawHP(ctx,4*S,4*S,bw,S,this.oppPk?.name||'???',this.oppHpCur,this.oppHpMax,false,this.oppPk?.lv||50);
+     this._drawHP(ctx,4*S,4*S,bw,S,this.oppPk?.name||'???',this.oppHpCur,this.oppHpMax,true,this.oppPk?.lv||50);
      this._drawHP(ctx,w-bw-4*S,h*.52,bw,S,this.myPk?.name||'???',this.myHpCur,this.myHpMax,true,50);
    },
 
