@@ -20,7 +20,7 @@
  const TILE=16,SC=2.5,TS=TILE*SC,MMS=140;
  const TEAM=[
    {name:'Bryan',pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},
-   {name:'Jérémy',pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'n'},
+   {name:'Jérémy',pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'oak'},
    {name:'Louis',pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'h'},
    {name:'Thomas',pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},
    {name:'Dylan',pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},
@@ -86,7 +86,7 @@
      exits:{7:[10,11]},
      exitTo:{mapId:'overworld',x:14,y:8,dir:'down'},
      music:null,
-     npcs:[{type:'guide',x:6,y:4,sprite:'/assets/walk-sprites/oak-down.png'}],
+     npcs:[{type:'guide',x:6,y:4,sprite:'/assets/walk-sprites/n-down.png'}],
      hotspots:[
        {x:6,y:4,action:'zone',zone:'kanto',label:'⚡ Prof. Chen - Super Efficace !'},
        {x:1,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},

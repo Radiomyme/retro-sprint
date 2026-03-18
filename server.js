@@ -13,7 +13,7 @@ app.get('/health',(req,res)=>res.json({ok:true,players:Object.keys(S.players).le
 
 console.log('Server starting...');
 
-const TEAM={'Bryan':{pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},'Jérémy':{pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'n'},'Louis':{pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'h'},'Thomas':{pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},'Dylan':{pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},'Martin':{pokemon:'Léviator',pokeId:130,color:'#2980B9',sprite:'f'},'Lucas':{pokemon:'Tortipouss',pokeId:387,color:'#27AE60',sprite:'g'}};
+const TEAM={'Bryan':{pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},'Jérémy':{pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'oak'},'Louis':{pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'h'},'Thomas':{pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},'Dylan':{pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},'Martin':{pokemon:'Léviator',pokeId:130,color:'#2980B9',sprite:'f'},'Lucas':{pokemon:'Tortipouss',pokeId:387,color:'#27AE60',sprite:'g'}};
 
 const S={players:{},cards:[],votes:{},phase:'free',
   openArenas:{kanto:false,johto:false,hoenn:false,league:false},
