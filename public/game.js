@@ -20,8 +20,8 @@
  const TILE=16,SC=2.5,TS=TILE*SC,MMS=140;
  const TEAM=[
    {name:'Bryan',pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},
-   {name:'Jérémy',pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'b'},
-   {name:'Louis',pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'c'},
+   {name:'Jérémy',pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'k'},
+   {name:'Louis',pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'h'},
    {name:'Thomas',pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},
    {name:'Dylan',pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},
    {name:'Martin',pokemon:'Léviator',pokeId:130,color:'#2980B9',sprite:'f'},
@@ -122,7 +122,7 @@
      exits:{7:[2,3]},
      exitTo:{mapId:'overworld',x:7,y:30,dir:'down'},
      music:null,
-     npcs:[{type:'villager',x:6,y:2,sprite:'/assets/walk-sprites/k-down.png'}],
+     npcs:[{type:'villager',x:6,y:2,sprite:'/assets/walk-sprites/c-down.png'}],
      hotspots:[
        {x:6,y:2,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
        {x:3,y:3,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
