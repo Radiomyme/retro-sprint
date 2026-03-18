@@ -20,7 +20,7 @@
  const TILE=16,SC=2.5,TS=TILE*SC,MMS=140;
  const TEAM=[
    {name:'Bryan',pokemon:'Lucario',pokeId:448,color:'#5B8FE8',sprite:'ash'},
-   {name:'Jérémy',pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'k'},
+   {name:'Jérémy',pokemon:'Dialga',pokeId:483,color:'#4A6FA5',sprite:'n'},
    {name:'Louis',pokemon:'Salamèche',pokeId:4,color:'#FF6B35',sprite:'h'},
    {name:'Thomas',pokemon:'Malvalame',pokeId:937,color:'#8B2FC9',sprite:'d'},
    {name:'Dylan',pokemon:'Dracaufeu',pokeId:6,color:'#E85D2C',sprite:'e'},
@@ -106,7 +106,7 @@
      exits:{7:[2,3]},
      exitTo:{mapId:'overworld',x:29,y:14,dir:'down'},
      music:null,
-     npcs:[{type:'villager',x:5,y:5,sprite:'/assets/walk-sprites/n-left.png'}],
+     npcs:[{type:'villager',x:5,y:5,sprite:'/assets/walk-sprites/k-left.png'}],
      hotspots:[
        {x:5,y:5,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
        {x:3,y:3,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
