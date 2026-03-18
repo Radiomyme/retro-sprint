@@ -46,10 +46,11 @@
      exits:{7:[3,4]},
      exitTo:{mapId:'overworld',x:13,y:26,dir:'down'},
      music:'/assets/music/maps/pokemon-center.mp3',
-     npcs:[{type:'nurse',x:3,y:3,sprite:'/assets/character/nurse-joy.png',dir:'down'}],
+     npcs:[],
      hotspots:[
-       {x:3,y:3,face:'up',action:'heal',label:'Infirmière Joëlle'},
-       {x:13,y:3,face:'up',action:'pokedex',label:'PC - Pokédex'}
+       {x:3,y:2,action:'heal',label:'Infirmière Joëlle'},
+       {x:4,y:2,action:'heal',label:'Infirmière Joëlle'},
+       {x:13,y:2,action:'pokedex',label:'PC - Pokédex'}
      ]
    },
    'gym':{
@@ -61,7 +62,8 @@
      music:'/assets/music/maps/pokemon-gym.mp3',
      npcs:[],
      hotspots:[
-       {x:4,y:2,face:'up',action:'zone',zone:'league',label:'🏆 Champion - Actions Sprint'}
+       {x:4,y:1,action:'zone',zone:'league',label:'🏆 Champion - Actions Sprint'},
+       {x:5,y:1,action:'zone',zone:'league',label:'🏆 Champion - Actions Sprint'}
      ]
    },
    'poke-mart':{
@@ -73,7 +75,8 @@
      music:'/assets/music/maps/pokemon-center.mp3',
      npcs:[],
      hotspots:[
-       {x:1,y:4,face:'up',action:'zone',zone:'hoenn',label:'✨ Vendeur - Imprévus & Partages'}
+       {x:1,y:5,action:'zone',zone:'hoenn',label:'✨ Vendeur - Imprévus & Partages'},
+       {x:1,y:4,action:'zone',zone:'hoenn',label:'✨ Vendeur - Imprévus & Partages'}
      ]
    },
    'museum-1f':{
@@ -85,8 +88,14 @@
      music:null,
      npcs:[],
      hotspots:[
-       {x:3,y:4,face:'up',action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
-       {x:6,y:4,face:'up',action:'zone',zone:'kanto',label:'⚡ Exposition - Super Efficace !'}
+       {x:1,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
+       {x:2,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
+       {x:3,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
+       {x:4,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
+       {x:1,y:5,action:'zone',zone:'kanto',label:'⚡ Exposition - Super Efficace !'},
+       {x:2,y:5,action:'zone',zone:'kanto',label:'⚡ Exposition - Super Efficace !'},
+       {x:3,y:5,action:'zone',zone:'kanto',label:'⚡ Exposition - Super Efficace !'},
+       {x:4,y:5,action:'zone',zone:'kanto',label:'⚡ Exposition - Super Efficace !'}
      ]
    },
    'npc-house-b':{
@@ -98,7 +107,10 @@
      music:null,
      npcs:[],
      hotspots:[
-       {x:4,y:2,face:'up',action:'zone',zone:'johto',label:"🌑 Journal - Qu'est-ce qui n'a pas marché ?"}
+       {x:3,y:3,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
+       {x:4,y:3,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
+       {x:3,y:4,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
+       {x:4,y:4,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"}
      ]
    },
    'npc-house-a':{
@@ -110,7 +122,10 @@
      music:null,
      npcs:[],
      hotspots:[
-       {x:4,y:2,face:'up',action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']}
+       {x:3,y:3,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
+       {x:4,y:3,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
+       {x:3,y:4,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
+       {x:4,y:4,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']}
      ]
    }
  };
@@ -220,18 +235,7 @@
 
  function drawHotspots(){
    document.querySelectorAll('.hotspot-ind').forEach(e=>e.remove());
-   if(curMap==='overworld')return;
-   const bld=BUILDINGS[curMap];if(!bld)return;
-   bld.hotspots.forEach(hs=>{
-     if(hs.action==='heal')return; // nurse handles this visually
-     const el=document.createElement('div');el.className='hotspot-ind';
-     el.style.cssText=`left:${hs.x*TS}px;top:${hs.y*TS}px;width:${TS}px;height:${TS}px;position:absolute;z-index:3;pointer-events:none`;
-     // Pulsing glow indicator
-     const zone=hs.zone?ZONES.find(z=>z.id===hs.zone):null;
-     const color=zone?zone.color:'#FFD93D';
-     el.innerHTML=`<div style="width:100%;height:100%;border:2px solid ${color};border-radius:4px;background:${color}22;animation:hsPulse 1.5s ease-in-out infinite"></div>`;
-     document.getElementById('map-container').appendChild(el);
-   });
+   // Hotspots are invisible - interact by pressing A while facing the object
  }
 
  // ═══ MAP TRANSITION ═══
