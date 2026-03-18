@@ -56,11 +56,11 @@
    'gym':{
      img:'/assets/map/interior/gym.png',w:10,h:14,
      start:{x:4,y:12},
-     walls:{0:[0,1,2,3,4,5,6,7,8,9],1:[0,9],2:[0,9],3:[0,1,2,3,6,7,8,9],4:[0,9],5:[0,2,5,6,7,9],6:[0,9],7:[0,2,5,6,7,9],8:[0,9],9:[0,1,2,3,6,7,8,9],10:[3,6]},
+     walls:{0:[0,1,2,3,4,5,6,7,8,9],1:[0,4,5,9],2:[0,9],3:[0,1,2,3,6,7,8,9],4:[0,9],5:[0,2,5,6,7,9],6:[0,9],7:[0,2,5,6,7,9],8:[0,9],9:[0,1,2,3,6,7,8,9],10:[3,6]},
      exits:{13:[4,5]},
      exitTo:{mapId:'overworld',x:16,y:18,dir:'down'},
      music:'/assets/music/maps/pokemon-gym.mp3',
-     npcs:[],
+     npcs:[{type:'champion',x:4,y:1,sprite:'/assets/walk-sprites/red-down.png'}],
      hotspots:[
        {x:4,y:1,action:'zone',zone:'league',label:'🏆 Champion - Actions Sprint'},
        {x:5,y:1,action:'zone',zone:'league',label:'🏆 Champion - Actions Sprint'}
@@ -82,12 +82,13 @@
    'museum-1f':{
      img:'/assets/map/interior/museum-1f.png',w:20,h:8,
      start:{x:10,y:6},
-     walls:{0:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],1:[11,12,13,14,15,16,17,18,19],2:[1,2,3,4,11,12,16],3:[1,2,3,4,11,12],4:[11],5:[1,2,3,4,8,11,12,13,14],6:[1,2,3,4,8,13,14,19],7:[8,13,14,19]},
+     walls:{0:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],1:[11,12,13,14,15,16,17,18,19],2:[1,2,3,4,11,12,16],3:[1,2,3,4,11,12],4:[6,11],5:[1,2,3,4,8,11,12,13,14],6:[1,2,3,4,8,13,14,19],7:[8,13,14,19]},
      exits:{7:[10,11]},
      exitTo:{mapId:'overworld',x:14,y:8,dir:'down'},
      music:null,
-     npcs:[],
+     npcs:[{type:'guide',x:6,y:4,sprite:'/assets/walk-sprites/oak-down.png'}],
      hotspots:[
+       {x:6,y:4,action:'zone',zone:'kanto',label:'⚡ Prof. Chen - Super Efficace !'},
        {x:1,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
        {x:2,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
        {x:3,y:3,action:'zone',zone:'kanto',label:'⚡ Fossiles - Super Efficace !'},
@@ -101,12 +102,13 @@
    'npc-house-b':{
      img:'/assets/map/interior/npc-house.png',w:8,h:8,
      start:{x:3,y:6},
-     walls:{0:[0,1,2,3,4,5,6,7],1:[0,1,7],3:[3,4],4:[3,4],6:[0,7],7:[0,7]},
+     walls:{0:[0,1,2,3,4,5,6,7],1:[0,1,7],3:[3,4],4:[3,4],5:[5],6:[0,7],7:[0,7]},
      exits:{7:[2,3]},
      exitTo:{mapId:'overworld',x:29,y:14,dir:'down'},
      music:null,
-     npcs:[],
+     npcs:[{type:'villager',x:5,y:5,sprite:'/assets/walk-sprites/n-left.png'}],
      hotspots:[
+       {x:5,y:5,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
        {x:3,y:3,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
        {x:4,y:3,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
        {x:3,y:4,action:'zone',zone:'johto',label:"🌑 Qu'est-ce qui n'a pas marché ?"},
@@ -116,12 +118,13 @@
    'npc-house-a':{
      img:'/assets/map/interior/npc-house.png',w:8,h:8,
      start:{x:3,y:6},
-     walls:{0:[0,1,2,3,4,5,6,7],1:[0,1,7],3:[3,4],4:[3,4],6:[0,7],7:[0,7]},
+     walls:{0:[0,1,2,3,4,5,6,7],1:[0,1,7],2:[6],3:[3,4],4:[3,4],6:[0,7],7:[0,7]},
      exits:{7:[2,3]},
      exitTo:{mapId:'overworld',x:7,y:30,dir:'down'},
      music:null,
-     npcs:[],
+     npcs:[{type:'villager',x:6,y:2,sprite:'/assets/walk-sprites/k-down.png'}],
      hotspots:[
+       {x:6,y:2,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
        {x:3,y:3,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
        {x:4,y:3,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
        {x:3,y:4,action:'text',texts:['Bienvenue à Pewter City !','La ville des pierres grises.']},
